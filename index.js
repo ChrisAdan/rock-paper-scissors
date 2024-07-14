@@ -4,16 +4,6 @@ let humanScore = 0;
 let computerScore = 0;
 let currentRound = 1;
 
-// Introduction
-console.log("Welcome to Rock Paper Scissors");
-console.log("Rock beats Scissors");
-console.log("Scissors beats Paper");
-console.log("Paper beats Rock");
-console.log(
-  `You will play ${NUMROUNDS} rounds. Whoever has the most wins at the end is the winner!`
-);
-console.log("May the odds be ever in your favor");
-
 // Get computer choice among Rock, Paper, Scissors
 function getComputerChoice() {
   // Store possible outcomes in an array;
@@ -21,7 +11,7 @@ function getComputerChoice() {
   // Generate a random number with 3 outcomes
   let computerChoice = CHOICES[randomSelection];
   // Create a string variable and store the value rock/paper/scissors based on random number
-  console.log(`Computer chose ${computerChoice}`);
+  //   console.log(`Computer chose ${computerChoice}`);
   return computerChoice;
 }
 
@@ -39,26 +29,29 @@ function getHumanChoice() {
   let humanChoice;
   do {
     humanChoice = prompt("Rock, Paper, Scissors?");
-  } while (!isValidHumanChoice(humanChoice));
+  } while (humanChoice && !isValidHumanChoice(humanChoice));
   return humanChoice.at(0).toUpperCase().concat(humanChoice.slice(1));
 }
 
 function isValidHumanChoice(choice) {
-  if (
-    !choice ||
+  if (!choice) {
+    console.log("Exiting program");
+  } else if (
     !CHOICES.find((str) => str.toLowerCase() === choice.toLowerCase())
   ) {
     console.log("Please input a valid choice (rock, paper, or scissors)");
     return false;
   } else {
-    console.log(`Human chose ${choice}`);
+    // console.log(`Human chose ${choice}`);
     return true;
   }
 }
 // Play a round
 function playRound(humanChoice, computerChoice) {
   // Announce round number
-  console.log(`Round ${currentRound}`);
+  let round = `Round ${currentRound}`;
+  console.group(round);
+  //   console.log(`Round ${currentRound}`);
   // Compare human and computer choice
   // if human and computer choices are same - tie
   // Strategy: if not tie, check 3 winning cases for an a->b relationship, if no win, check the other way around
@@ -66,6 +59,7 @@ function playRound(humanChoice, computerChoice) {
   // increment winner's score
   if (humanChoice === computerChoice) {
     // Tie
+    console.log(`It's a tie! You both chose ${humanChoice || computerChoice}`);
   } else if (isWinner(humanChoice, computerChoice)) {
     // Human wins
     humanScore++;
@@ -81,6 +75,7 @@ function playRound(humanChoice, computerChoice) {
   console.log(
     `The score is now: Player: ${humanScore} | Computer: ${computerScore}`
   );
+  console.groupEnd(round);
   // increment round number
   currentRound++;
 }
@@ -108,9 +103,55 @@ function isWinner(a, b) {
   }
 }
 
-// Generate Computer choice
-// const computerChoice = getComputerChoice();
-// Get human choice
-// const humanChoice = getHumanChoice();
+function playGame() {
+  while (currentRound <= NUMROUNDS) {
+    let computerChoice = getComputerChoice();
+    let humanChoice = getHumanChoice();
+    playRound(humanChoice, computerChoice);
+  }
+  announceWinner();
+}
 
-// Play entire game (5 rounds)
+function announceWinner() {
+  console.group(`Game Summary`);
+  console.log(
+    `Gamer over! Final Scores: Player: ${humanScore} | Computer: ${computerScore}`
+  );
+  humanScore === computerScore
+    ? console.log(`It's a tie!`)
+    : humanScore > computerScore
+    ? console.log(`You win! Great work.`)
+    : humanScore < computerScore
+    ? console.log(`You lose :( big sad.`)
+    : console.log("Seriously, how did we get here?");
+  console.groupEnd(`Game Summary`);
+}
+
+function runProgram() {
+  let continueGame = true;
+  showIntroduction();
+  do {
+    playGame();
+    let selection = prompt("Play again? Y/N");
+    if (!selection || selection.toLowerCase() === "n") {
+      continueGame = false;
+    } else {
+      console.log("Starting new game");
+      currentRound = 1;
+      humanScore = 0;
+      computerScore = 0;
+    }
+  } while (continueGame);
+  console.log("Thanks for playing! Goodbye.");
+}
+
+function showIntroduction() {
+  console.log(
+    `You will play ${NUMROUNDS} rounds. Whoever has the most wins at the end is the winner!`
+  );
+  console.log("May the odds be ever in your favor");
+}
+
+const run = document.getElementById("start-game");
+
+run.addEventListener("click", () => runProgram());

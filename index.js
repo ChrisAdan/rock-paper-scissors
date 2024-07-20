@@ -4,6 +4,7 @@ let humanScore = 0;
 let computerScore = 0;
 let currentRound = 1;
 
+//  Game logic
 function getComputerChoice() {
   let randomSelection = Math.floor(Math.random() * 100) % 3;
   let computerChoice = CHOICES[randomSelection];
@@ -49,7 +50,9 @@ function playRound(humanChoice, computerChoice) {
     computerScore++;
     console.log(`You lose! ${computerChoice} beats ${humanChoice}.`);
   } else {
-    throw new TypeError("How did we get here?");
+    throw new TypeError(
+      `Invalid choice argument: human (${humanChoice}) | ai (${computerChoice})`
+    );
   }
 
   console.log(
@@ -70,15 +73,14 @@ function isWinner(a, b) {
     return false;
   }
 }
-
-function playGame() {
-  while (currentRound <= NUMROUNDS) {
-    let computerChoice = getComputerChoice();
-    let humanChoice = getHumanChoice();
-    playRound(humanChoice, computerChoice);
-  }
-  announceWinner();
-}
+// function playGame() {
+//   while (currentRound <= NUMROUNDS) {
+//     let computerChoice = getComputerChoice();
+//     let humanChoice = getHumanChoice();
+//     playRound(humanChoice, computerChoice);
+//   }
+//   announceWinner();
+// }
 
 function announceWinner() {
   console.group(`Game Summary`);
@@ -120,7 +122,16 @@ function showIntroduction() {
   );
   console.log("May the odds be ever in your favor");
 }
+// DOM Manipulation
 
-const run = document.getElementById("start-game");
-
-run.addEventListener("click", () => runProgram());
+const cards = document.querySelectorAll(".weapon");
+cards.forEach((card) => {
+  let playerChoice = card.getAttribute("id");
+  playerChoice = playerChoice
+    .at(0)
+    .toUpperCase()
+    .concat(playerChoice.slice(1).toLowerCase());
+  card.addEventListener("click", () => {
+    playRound(playerChoice, getComputerChoice());
+  });
+});

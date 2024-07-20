@@ -4,15 +4,50 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Rock Paper Scissors</title>
+    <link rel="stylesheet" href="style.css" />
     <script src="index.js" defer></script>
   </head>
+  <header>
+    <nav class="navbar">
+      <div class="brand">rps.io</div>
+      <div class="round-counter">Round: <span>XYZ</span></div>
+      <ul class="navmenu">
+        <li>
+          <button id="toggle-history"><span>See</span> History</button>
+        </li>
+        <li><button id="start-game">Play</button></li>
+      </ul>
+    </nav>
+  </header>
   <body>
-    <h1>Rock Paper Scissors</h1>
-    <h2>Press Ctrl + Shift + C to open your browser console</h2>
-    <p>Rock beats Scissors</p>
-    <p>Scissors beats Paper</p>
-    <p>Paper beats Rock</p>
-
-    <button id="start-game">Click to Start</button>
+    <section class="score-counters">
+      <div class="score">Insert Player Name: <span>4</span></div>
+      <div class="score">AI: <span>2</span></div>
+    </section>
+    <section class="selection-cards">
+      <div class="card-row">
+        <div class="card">Rock</div>
+        <div class="card">Paper</div>
+        <div class="card">Scissors</div>
+      </div>
+      <div class="headline"><h1>Choose your instrument</h1></div>
+    </section>
+    <section class="analytics">
+      <div class="analytics-container">
+        <div class="analytics-card" id="win-history">
+          Win History:
+          <div class="box" style="border: 1px solid black">Table here</div>
+        </div>
+        <div class="analytics-card" id="move-history">
+          Move History:
+          <div class="box" style="border: 1px solid black">Table here</div>
+        </div>
+        <div class="analytics-card" id="loss-history">
+          Loss History:
+          <div class="box" style="border: 1px solid black">Table here</div>
+        </div>
+      </div>
+    </section>
+    <section class="footer">&copy; 2024 Chris Adan</section>
   </body>
 </html>

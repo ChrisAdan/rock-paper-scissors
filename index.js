@@ -5,32 +5,157 @@ let playerScore;
 let computerScore;
 let currentRound;
 
-//  Game logic
+document.addEventListener("DOMContentLoaded", initializeGame);
+
+// Button to start game
+const playButton = document.querySelector("#start-game");
+playButton.addEventListener("click", () => {
+  resetCommonGameElements();
+  ensurePlayerName();
+});
+
+// Click card to play round
+const cards = document.querySelectorAll(".weapon");
+cards.forEach((selection) => {
+  selection.addEventListener("click", () => {
+    ensurePlayerName();
+    const roundInputs = generateRoundInputs(selection);
+    const roundWinner = playRound(roundInputs);
+    console.log(roundInputs);
+    updateRoundCounter();
+    if (roundWinner) {
+      updateScore(roundWinner);
+    }
+    generateRoundReport(roundWinner, roundInputs);
+    // Function for appending row to Move History table
+    appendRoundRecordToHistory(roundWinner, roundInputs);
+    currentRound += 1;
+  });
+});
+
+function appendRoundRecordToHistory(roundWinner, roundInputs) {
+  const trackerTable = document.querySelector("#move-history-table");
+  const roundRecord = generateNewRoundRecord(roundWinner, roundInputs);
+  trackerTable.appendChild(roundRecord);
+}
+function generateNewRoundRecord(roundWinner, roundInputs) {
+  const recordRow = document.createElement("tr");
+  const record = {};
+  record.round = currentRound;
+  record.playerChoice = roundInputs.playerChoice;
+  record.computerChoice = roundInputs.computerChoice;
+  record.winner = roundWinner;
+  record.playerScore = playerScore;
+  record.computerScore = computerScore;
+
+  for (const [key, value] of Object.entries(record)) {
+    let rowData;
+    if (key === "round") {
+      rowData = document.createElement("th");
+    } else {
+      rowData = document.createElement("td");
+    }
+    if (key === "winner") {
+      if (!value) {
+        rowData.textContent = "Tie";
+      } else {
+        rowData.textContent = toTitleCase(value);
+      }
+    } else {
+      rowData.textContent = value;
+    }
+    recordRow.appendChild(rowData);
+  }
+  return recordRow;
+}
+// Button to Toggle History display
+const historyButton = document.querySelector("#toggle-history");
+historyButton.addEventListener("click", () => {
+  const moveHistoryTable = document.querySelector(
+    ".analytics-card#move-history-container"
+  );
+  moveHistoryTable.classList.toggle("hide");
+  if (moveHistoryTable.classList.contains("hide")) {
+    historyButton.textContent = historyButton.textContent.replace(
+      "Hide",
+      "Show"
+    );
+  } else {
+    historyButton.textContent = historyButton.textContent.replace(
+      "Show",
+      "Hide"
+    );
+  }
+});
+
+function initializeGame() {
+  resetCommonGameElements();
+  hideHiddenElements();
+}
+
+function resetCommonGameElements() {
+  playerScore = 0;
+  computerScore = 0;
+  currentRound = 1;
+  updateRoundCounter();
+  updateScore("player");
+  updateScore("ai");
+  clearRoundReport();
+  createMoveHistory();
+}
+function ensurePlayerName() {
+  if (!playerName) {
+    playerName = getPlayerName();
+  }
+  setupPlayer(playerName);
+}
+function getPlayerName() {
+  const playerName = prompt("Enter a Name for your Player");
+  return playerName;
+}
+function setupPlayer(name) {
+  const playerNameElement = document.querySelector(".player-name");
+  playerNameElement.textContent = name;
+}
+function generateRoundInputs(selection) {
+  let roundInputs = {};
+  let currentChoice = selection.getAttribute("id");
+  currentChoice = toTitleCase(currentChoice);
+  roundInputs.playerChoice = currentChoice;
+  roundInputs.computerChoice = getComputerChoice();
+  return roundInputs;
+}
+
+function toTitleCase(string) {
+  if (string == "ai") {
+    return string.toUpperCase();
+  } else {
+    return string.at(0).toUpperCase().concat(string.slice(1).toLowerCase());
+  }
+}
 function getComputerChoice() {
   let randomSelection = Math.floor(Math.random() * 100) % 3;
   let computerChoice = CHOICES[randomSelection];
   return computerChoice;
 }
-
-function playRound(playerChoice, computerChoice) {
-  if (playerChoice === computerChoice) {
+function playRound(choices) {
+  if (choices.playerChoice === choices.computerChoice) {
     // Tie
     return false;
-  } else if (isWinner(playerChoice, computerChoice)) {
+  } else if (isWinner(choices.playerChoice, choices.computerChoice)) {
     // player wins
     playerScore += 1;
     return "player";
-  } else if (isWinner(computerChoice, playerChoice)) {
+  } else if (isWinner(choices.computerChoice, choices.playerChoice)) {
     // Computer Wins
     computerScore += 1;
     return "ai";
   } else {
     throw new TypeError(
-      `Invalid choice argument: player (${playerChoice}) | ai (${computerChoice})`
+      `Invalid choice argument: player (${choices.playerChoice}) | ai (${choices.computerChoice})`
     );
   }
 }
-
 function isWinner(a, b) {
   if (a === "Rock" && b === "Scissors") {
     return true;
@@ -42,69 +167,10 @@ function isWinner(a, b) {
     return false;
   }
 }
-
-// DOM Manipulation
-
-document.addEventListener("DOMContentLoaded", setupGame);
-
-function setupGame() {
-  playerScore = 0;
-  computerScore = 0;
-  currentRound = 1;
-  updateRoundCounter();
-  updateScore("player");
-  updateScore("ai");
-  clearRoundReport();
-  createMoveHistory();
-}
-
-function setupPlayer(name) {
-  const playerNameElement = document.querySelector(".player-name");
-  playerNameElement.textContent = name;
-}
-
-// Button to start game
-const playButton = document.querySelector("#start-game");
-playButton.addEventListener("click", () => {
-  setupGame();
-  if (!playerName) {
-    playerName = prompt("Enter a Name for your Player");
-  }
-  setupPlayer(playerName);
-});
-
-// Click card to play round
-const cards = document.querySelectorAll(".weapon");
-cards.forEach((card) => {
-  card.addEventListener("click", () => {
-    let computerChoice = getComputerChoice();
-    let playerChoice = card.getAttribute("id");
-    playerChoice = playerChoice
-      .at(0)
-      .toUpperCase()
-      .concat(playerChoice.slice(1).toLowerCase());
-    const roundWinner = playRound(playerChoice, computerChoice);
-    updateRoundCounter();
-    if (roundWinner) {
-      updateScore(roundWinner);
-    }
-    generateRoundReport(roundWinner, { playerChoice, computerChoice });
-    currentRound += 1;
-  });
-});
-
-// Button to Display History
-const historyButton = document.querySelector("#toggle-history");
-historyButton.addEventListener("click", () => {
-  const moveHistoryTable = document.querySelector("#move-history-container");
-  moveHistoryTable.classList.toggle("hide");
-});
-
 function updateRoundCounter() {
   const roundCounter = document.querySelector(".round-counter");
   roundCounter.textContent = currentRound;
 }
-
 function updateScore(winner) {
   const winnerScoreDisplay = document.querySelector(".".concat(winner));
   if (winner === "player") {
@@ -115,7 +181,6 @@ function updateScore(winner) {
     throw new TypeError(`Invalid input ${winner}`);
   }
 }
-
 function generateRoundReport(winner, choices) {
   const roundReportElement = document.querySelector(".round-report");
   if (winner === "player") {
@@ -128,26 +193,31 @@ function generateRoundReport(winner, choices) {
     }`;
   }
 }
-
 function clearRoundReport() {
   const roundReportElement = document.querySelector(".round-report");
   roundReportElement.textContent = "";
 }
-
-// TODO: have move history hidden on startup
 function createMoveHistory() {
   // Get reference to div where table will live
-  const tableDiv = document.querySelector("#move-history-container");
+  const tableDiv = document.querySelector("#move-history");
   // Function to create and return Table element
   const trackerTable = constructTrackerTable();
   tableDiv.appendChild(trackerTable);
 }
 function constructTrackerTable() {
+  eraseExistingTable();
   const trackerTable = document.createElement("table");
   // Function to create and return table headers
   const trackerTableHead = constructTableHeaders();
   trackerTable.appendChild(trackerTableHead);
+  trackerTable.setAttribute("id", "move-history-table");
   return trackerTable;
+}
+function eraseExistingTable() {
+  const existingTable = document.querySelector("#move-history-table");
+  if (existingTable) {
+    existingTable.remove();
+  }
 }
 function constructTableHeaders() {
   const trackerTableHead = document.createElement("thead");
@@ -193,12 +263,10 @@ function createTableSubHeaderRow() {
   const rowPairs = ["Selection", "Winner"];
   rowPairs.forEach(() => {
     const newHeaders = createTableSubheadPair(subHeaders);
-    console.log(newHeaders);
     newHeaders.map((subHeader) => headerRow.appendChild(subHeader));
   });
   return headerRow;
 }
-
 function createTableSubheadPair(subHeaders) {
   let resultElements = [];
   subHeaders.forEach((header) => {
@@ -208,4 +276,13 @@ function createTableSubheadPair(subHeaders) {
     resultElements.push(newHeader);
   });
   return resultElements;
+}
+
+function hideHiddenElements() {
+  const elements = [];
+  const tableContainer = document.querySelector("#move-history-container");
+  elements.push(tableContainer);
+  elements.forEach((element) => {
+    element.classList.add("hide");
+  });
 }

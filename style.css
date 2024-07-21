@@ -47,10 +47,6 @@ tfoot {
   border: 1px solid black;
 }
 
-.hide {
-  display: none;
-}
-
 .footer {
   padding: 15px;
   display: flex;
@@ -111,4 +107,8 @@ tfoot {
 
 .analytics-card#move-history {
   flex-grow: 2;
+}
+
+.hide {
+  display: none;
 }

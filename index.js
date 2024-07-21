@@ -4,6 +4,7 @@ let playerName;
 let playerScore;
 let computerScore;
 let currentRound;
+// let winHistory;
 
 document.addEventListener("DOMContentLoaded", initializeGame);
 
@@ -71,11 +72,11 @@ function generateNewRoundRecord(roundWinner, roundInputs) {
 // Button to Toggle History display
 const historyButton = document.querySelector("#toggle-history");
 historyButton.addEventListener("click", () => {
-  const moveHistoryTable = document.querySelector(
+  const moveHistoryContainer = document.querySelector(
     ".analytics-card#move-history-container"
   );
-  moveHistoryTable.classList.toggle("hide");
-  if (moveHistoryTable.classList.contains("hide")) {
+  toggleVisibility(moveHistoryContainer);
+  if (moveHistoryContainer.classList.contains("hide")) {
     historyButton.textContent = historyButton.textContent.replace(
       "Hide",
       "Show"
@@ -283,6 +284,21 @@ function hideHiddenElements() {
   const tableContainer = document.querySelector("#move-history-container");
   elements.push(tableContainer);
   elements.forEach((element) => {
-    element.classList.add("hide");
+    hideElement(element);
   });
+}
+
+function showElement(element) {
+  element.classList.remove("hide");
+}
+function hideElement(element) {
+  element.classList.add("hide");
+}
+
+function toggleVisibility(element) {
+  if (element.classList.contains("hide")) {
+    showElement(element);
+  } else {
+    hideElement(element);
+  }
 }

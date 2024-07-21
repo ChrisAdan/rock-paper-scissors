@@ -21,7 +21,7 @@
   </header>
   <body>
     <section class="score-counters">
-      <div>Insert Player Name: <span class="player"></span></div>
+      <div><span class="player-name"></span>: <span class="player"></span></div>
       <div class="round-report"></div>
       <div>AI: <span class="ai"></span></div>
     </section>
@@ -41,7 +41,11 @@
         </div>
         <div class="analytics-card" id="move-history">
           Move History:
-          <div class="box" style="border: 1px solid black">Table here</div>
+          <div
+            class="box"
+            id="move-history-container"
+            style="border: 1px solid black"
+          ></div>
         </div>
         <div class="analytics-card" id="loss-history">
           Loss History:

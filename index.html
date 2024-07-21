@@ -15,6 +15,9 @@
         <li>
           <button id="toggle-history"><span>Show</span> History</button>
         </li>
+        <li>
+          <button id="toggle-stats"><span>Show</span> Statistics</button>
+        </li>
         <li><button id="start-game">Play</button></li>
       </ul>
     </nav>
@@ -35,9 +38,13 @@
     </section>
     <section class="analytics">
       <div class="analytics-container">
-        <div class="analytics-card" id="win-history">
+        <div class="analytics-card" id="win-history-container">
           Win History:
-          <div class="box" style="border: 1px solid black">Table here</div>
+          <div
+            class="box"
+            id="win-history"
+            style="border: 1px solid black"
+          ></div>
         </div>
         <div class="analytics-card" id="move-history-container">
           Move History:
@@ -47,9 +54,13 @@
             style="border: 1px solid black"
           ></div>
         </div>
-        <div class="analytics-card" id="loss-history">
+        <div class="analytics-card" id="loss-history-container">
           Loss History:
-          <div class="box" style="border: 1px solid black">Table here</div>
+          <div
+            class="box"
+            id="loss-history"
+            style="border: 1px solid black"
+          ></div>
         </div>
       </div>
     </section>

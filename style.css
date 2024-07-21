@@ -46,6 +46,13 @@ td,
 tfoot {
   border: 1px solid black;
 }
+table {
+  width: 100%;
+  text-align: center;
+}
+section {
+  padding: 0 15vw;
+}
 
 .footer {
   padding: 15px;
@@ -61,7 +68,7 @@ tfoot {
   align-items: center;
 }
 .score-counters {
-  padding: 30px;
+  padding: 30px 20vw;
   display: flex;
   justify-content: space-between;
 }
@@ -87,8 +94,9 @@ tfoot {
   height: 250px;
   border: 1px solid black;
 }
+
 .analytics {
-  padding: 32px;
+  padding: 50px 5vw;
 }
 
 .analytics-container {

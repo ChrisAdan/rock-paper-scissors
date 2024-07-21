@@ -88,6 +88,23 @@ historyButton.addEventListener("click", () => {
     );
   }
 });
+// Button to Toggle Statistics display
+const statsButton = document.querySelector("#toggle-stats");
+statsButton.addEventListener("click", () => {
+  const winStatsContainer = document.querySelector(
+    ".analytics-card#win-history-container"
+  );
+  const lossStatsContainer = document.querySelector(
+    ".analytics-card#loss-history-container"
+  );
+  toggleVisibility(winStatsContainer);
+  toggleVisibility(lossStatsContainer);
+  if (isHidden(winStatsContainer) || isHidden(lossStatsContainer)) {
+    statsButton.textContent = statsButton.textContent.replace("Hide", "Show");
+  } else {
+    statsButton.textContent = statsButton.textContent.replace("Show", "Hide");
+  }
+});
 
 function initializeGame() {
   resetCommonGameElements();
@@ -283,6 +300,14 @@ function hideHiddenElements() {
   const elements = [];
   const tableContainer = document.querySelector("#move-history-container");
   elements.push(tableContainer);
+  const winStatsContainer = document.querySelector(
+    ".analytics-card#win-history-container"
+  );
+  elements.push(winStatsContainer);
+  const lossStatsContainer = document.querySelector(
+    ".analytics-card#loss-history-container"
+  );
+  elements.push(lossStatsContainer);
   elements.forEach((element) => {
     hideElement(element);
   });
@@ -296,9 +321,13 @@ function hideElement(element) {
 }
 
 function toggleVisibility(element) {
-  if (element.classList.contains("hide")) {
+  if (isHidden(element)) {
     showElement(element);
   } else {
     hideElement(element);
   }
+}
+
+function isHidden(element) {
+  return element.classList.contains("hide");
 }

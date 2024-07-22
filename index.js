@@ -4,8 +4,7 @@ let playerName;
 let playerScore;
 let computerScore;
 let currentRound;
-// let winHistory;
-
+let statistics;
 document.addEventListener("DOMContentLoaded", initializeGame);
 
 // Button to start game
@@ -22,10 +21,9 @@ cards.forEach((selection) => {
     ensurePlayerName();
     const roundInputs = generateRoundInputs(selection);
     const roundWinner = playRound(roundInputs);
-    console.log(roundInputs);
     updateRoundCounter();
     if (roundWinner) {
-      updateScore(roundWinner);
+      updateScoreCounter(roundWinner);
     }
     generateRoundReport(roundWinner, roundInputs);
     // Function for appending row to Move History table
@@ -34,41 +32,6 @@ cards.forEach((selection) => {
   });
 });
 
-function appendRoundRecordToHistory(roundWinner, roundInputs) {
-  const trackerTable = document.querySelector("#move-history-table");
-  const roundRecord = generateNewRoundRecord(roundWinner, roundInputs);
-  trackerTable.appendChild(roundRecord);
-}
-function generateNewRoundRecord(roundWinner, roundInputs) {
-  const recordRow = document.createElement("tr");
-  const record = {};
-  record.round = currentRound;
-  record.playerChoice = roundInputs.playerChoice;
-  record.computerChoice = roundInputs.computerChoice;
-  record.winner = roundWinner;
-  record.playerScore = playerScore;
-  record.computerScore = computerScore;
-
-  for (const [key, value] of Object.entries(record)) {
-    let rowData;
-    if (key === "round") {
-      rowData = document.createElement("th");
-    } else {
-      rowData = document.createElement("td");
-    }
-    if (key === "winner") {
-      if (!value) {
-        rowData.textContent = "Tie";
-      } else {
-        rowData.textContent = toTitleCase(value);
-      }
-    } else {
-      rowData.textContent = value;
-    }
-    recordRow.appendChild(rowData);
-  }
-  return recordRow;
-}
 // Button to Toggle History display
 const historyButton = document.querySelector("#toggle-history");
 historyButton.addEventListener("click", () => {
@@ -105,19 +68,51 @@ statsButton.addEventListener("click", () => {
     statsButton.textContent = statsButton.textContent.replace("Show", "Hide");
   }
 });
-
+function createNewScoreData() {
+  const stats = {
+    player: {
+      rock: {
+        win: 0,
+        loss: 0,
+      },
+      paper: {
+        win: 0,
+        loss: 0,
+      },
+      scissors: {
+        win: 0,
+        loss: 0,
+      },
+    },
+    ai: {
+      rock: {
+        win: 0,
+        loss: 0,
+      },
+      paper: {
+        win: 0,
+        loss: 0,
+      },
+      scissors: {
+        win: 0,
+        loss: 0,
+      },
+    },
+  };
+  return stats;
+}
 function initializeGame() {
   resetCommonGameElements();
   hideHiddenElements();
 }
-
 function resetCommonGameElements() {
   playerScore = 0;
   computerScore = 0;
   currentRound = 1;
+  statistics = createNewScoreData();
   updateRoundCounter();
-  updateScore("player");
-  updateScore("ai");
+  updateScoreCounter("player");
+  updateScoreCounter("ai");
   clearRoundReport();
   initializeMoveHistory();
   initializeStatistics();
@@ -143,14 +138,6 @@ function generateRoundInputs(selection) {
   roundInputs.playerChoice = currentChoice;
   roundInputs.computerChoice = getComputerChoice();
   return roundInputs;
-}
-
-function toTitleCase(string) {
-  if (string == "ai") {
-    return string.toUpperCase();
-  } else {
-    return string.at(0).toUpperCase().concat(string.slice(1).toLowerCase());
-  }
 }
 function getComputerChoice() {
   let randomSelection = Math.floor(Math.random() * 100) % 3;
@@ -190,7 +177,7 @@ function updateRoundCounter() {
   const roundCounter = document.querySelector(".round-counter");
   roundCounter.textContent = currentRound;
 }
-function updateScore(winner) {
+function updateScoreCounter(winner) {
   const winnerScoreDisplay = document.querySelector(".".concat(winner));
   if (winner === "player") {
     winnerScoreDisplay.textContent = playerScore;
@@ -200,17 +187,77 @@ function updateScore(winner) {
     throw new TypeError(`Invalid input ${winner}`);
   }
 }
+function appendRoundRecordToHistory(roundWinner, roundInputs) {
+  const trackerTable = document.querySelector("#move-history-table");
+  const roundRecord = generateNewRoundRecord(roundWinner, roundInputs);
+  trackerTable.appendChild(roundRecord);
+}
+function generateNewRoundRecord(roundWinner, roundInputs) {
+  const recordRow = document.createElement("tr");
+  const record = {};
+  record.round = currentRound;
+  record.playerChoice = roundInputs.playerChoice;
+  record.computerChoice = roundInputs.computerChoice;
+  record.winner = roundWinner;
+  record.playerScore = playerScore;
+  record.computerScore = computerScore;
+
+  for (const [key, value] of Object.entries(record)) {
+    let rowData;
+    if (key === "round") {
+      rowData = document.createElement("th");
+    } else {
+      rowData = document.createElement("td");
+    }
+    if (key === "winner") {
+      if (!value) {
+        rowData.textContent = "Tie";
+      } else {
+        rowData.textContent = toTitleCase(value);
+      }
+    } else {
+      rowData.textContent = value;
+    }
+    recordRow.appendChild(rowData);
+  }
+  return recordRow;
+}
 function generateRoundReport(winner, choices) {
   const roundReportElement = document.querySelector(".round-report");
   if (winner === "player") {
     roundReportElement.textContent = `${playerName} wins, ${choices.playerChoice} beats ${choices.computerChoice}`;
+    updateStatistics(winner, choices.playerChoice, choices.computerChoice);
   } else if (winner === "ai") {
     roundReportElement.textContent = `AI wins, ${choices.computerChoice} beats ${choices.playerChoice}`;
+    updateStatistics(winner, choices.computerChoice, choices.playerChoice);
   } else if (!winner) {
     roundReportElement.textContent = `It's a tie! Both sides chose ${
       choices.playerChoice || choices.computerChoice
     }`;
   }
+}
+
+// TO DO: FIND WAY TO UPDATE WIN/LOSS RATE AS PART OF UPDATE
+function updateStatistics(winner, winChoice, loseChoice) {
+  const loser = winner === "player" ? "ai" : "player";
+  const winRecord = document.querySelector(
+    `#${winChoice.toLowerCase()}-${winner}-win`
+  );
+  statistics[winner][winChoice.toLowerCase()]["win"] += 1;
+  winRecord.textContent = statistics[winner][winChoice.toLowerCase()]["win"];
+  const winRate = document.querySelector(
+    `#${winChoice.toLowerCase()}-win-rate`
+  );
+  winRate.textContent = calculateRate(winChoice, "win");
+  const lossRecord = document.querySelector(
+    `#${loseChoice.toLowerCase()}-${loser}-loss`
+  );
+  statistics[loser][loseChoice.toLowerCase()]["loss"] += 1;
+  lossRecord.textContent = statistics[loser][loseChoice.toLowerCase()]["loss"];
+  const lossRate = document.querySelector(
+    `#${loseChoice.toLowerCase()}-loss-rate`
+  );
+  lossRate.textContent = calculateRate(loseChoice, "loss");
 }
 function clearRoundReport() {
   const roundReportElement = document.querySelector(".round-report");
@@ -220,24 +267,22 @@ function initializeMoveHistory() {
   // Get reference to div where table will live
   const tableDiv = document.querySelector("#move-history");
   // Function to create and return Table element
-  const trackerTable = constructTrackerTable();
+  const trackerTable = createTrackerTable();
   tableDiv.appendChild(trackerTable);
 }
-
 function initializeStatistics() {
   const types = ["win", "loss"];
   types.forEach((type) => {
     const tableDiv = document.querySelector(`#${type}-history`);
-    console.log(tableDiv);
-    const newTable = constructStatsTable(type);
+    const newTable = createStatsTable(type);
     tableDiv.appendChild(newTable);
   });
 }
-function constructTrackerTable() {
+function createTrackerTable() {
   eraseExistingTable("#move-history-table");
   const trackerTable = document.createElement("table");
   // Function to create and return table headers
-  const trackerTableHead = constructTableHeaders();
+  const trackerTableHead = createTableHeaders();
   trackerTable.appendChild(trackerTableHead);
   trackerTable.setAttribute("id", "move-history-table");
   return trackerTable;
@@ -248,7 +293,7 @@ function eraseExistingTable(selector) {
     existingTable.remove();
   }
 }
-function constructTableHeaders() {
+function createTableHeaders() {
   const trackerTableHead = document.createElement("thead");
   const headers = ["Round No.", "Selection", "Winner", "Score"];
   // for each header, create col element and append to parent thead
@@ -306,20 +351,24 @@ function createTableSubheadPair(subHeaders) {
   });
   return resultElements;
 }
-
-function constructStatsTable(type) {
+function createStatsTable(type) {
   eraseExistingTable(`#${type}-history-table`);
   const newTable = document.createElement("table");
   // Function to create and return table headers
-  const newTableHeaders = constructStatsTableHeaders(type);
+  const newTableHeaders = createStatsTableHeaders(type);
   newTable.appendChild(newTableHeaders);
+  const newTableBody = createStatsTableBody(type);
+  newTable.appendChild(newTableBody);
   newTable.setAttribute("id", `${type}-history-table`);
   return newTable;
 }
-
-function constructStatsTableHeaders(type) {
+function createStatsTableHeaders(type) {
   const newTableHead = document.createElement("thead");
-  const headers = ["Selection", "Win Count", "Player Win Rate (%)"];
+  const headers = [
+    "Selection",
+    `${toTitleCase(type)} Count`,
+    `Player ${toTitleCase(type)} Rate (%)`,
+  ];
   // For each header, create col element and append to parent thead
   headers.forEach((header) => {
     let newCol;
@@ -332,21 +381,20 @@ function constructStatsTableHeaders(type) {
     newTableHead.appendChild(newCol);
   });
 
-  // Construct TR 1 - top level headers
-  const headerRow = createStatsTableHeaderRow(headers);
+  // create TR 1 - top level headers
+  const headerRow = createStatsTableHeaderRow(type, headers);
   newTableHead.appendChild(headerRow);
 
-  // Construct TR 2 - top level headers
+  // create TR 2 - top level headers
   const subHeaderRow = createStatsTableSubHeaders();
   newTableHead.appendChild(subHeaderRow);
   return newTableHead;
 }
-
-function createStatsTableHeaderRow(headers) {
+function createStatsTableHeaderRow(type, headers) {
   const headerRow = document.createElement("tr");
   headers.forEach((header) => {
     let newCol = document.createElement("th");
-    if (["Win Count"].includes(header)) {
+    if ([`${toTitleCase(type)} Count`].includes(header)) {
       newCol.setAttribute("colspan", "2");
     } else {
       newCol.setAttribute("rowspan", "2");
@@ -357,7 +405,6 @@ function createStatsTableHeaderRow(headers) {
   });
   return headerRow;
 }
-
 function createStatsTableSubHeaders() {
   const subHeaderRow = document.createElement("tr");
   const subHeaders = ["Player", "AI"];
@@ -369,7 +416,46 @@ function createStatsTableSubHeaders() {
   });
   return subHeaderRow;
 }
+function createStatsTableBody(type) {
+  const newBody = document.createElement("tbody");
+  CHOICES.forEach((choice) => {
+    const newRow = document.createElement("tr");
+    const selection = document.createElement("th");
+    selection.setAttribute("scope", "row");
+    selection.textContent = choice;
+    newRow.appendChild(selection);
+    const players = ["player", "ai"];
+    players.forEach((player) => {
+      const statistic = document.createElement("td");
+      statistic.textContent = statistics[player][choice.toLowerCase()][type];
+      statistic.setAttribute("id", `${choice.toLowerCase()}-${player}-${type}`);
+      newRow.appendChild(statistic);
+    });
+    const rate = document.createElement("td");
+    const percentage = Math.round(
+      (statistics["player"][choice.toLowerCase()][type] /
+        (statistics["player"][choice.toLowerCase()][type] +
+          statistics["ai"][choice.toLowerCase()][type])) *
+        100
+    );
+    rate.textContent = percentage || 0;
+    rate.setAttribute("id", `${choice.toLowerCase()}-${type}-rate`);
+    newRow.appendChild(rate);
+    newBody.appendChild(newRow);
+  });
+  return newBody;
+}
 
+function calculateRate(choice, type) {
+  let rewRate;
+  newRate = Math.round(
+    (statistics["player"][choice.toLowerCase()][type] /
+      (statistics["player"][choice.toLowerCase()][type] +
+        statistics["ai"][choice.toLowerCase()][type])) *
+      100
+  );
+  return newRate;
+}
 function hideHiddenElements() {
   const elements = [];
   const tableContainer = document.querySelector("#move-history-container");
@@ -386,14 +472,12 @@ function hideHiddenElements() {
     hideElement(element);
   });
 }
-
 function showElement(element) {
   element.classList.remove("hide");
 }
 function hideElement(element) {
   element.classList.add("hide");
 }
-
 function toggleVisibility(element) {
   if (isHidden(element)) {
     showElement(element);
@@ -401,7 +485,13 @@ function toggleVisibility(element) {
     hideElement(element);
   }
 }
-
 function isHidden(element) {
   return element.classList.contains("hide");
+}
+function toTitleCase(string) {
+  if (string == "ai") {
+    return string.toUpperCase();
+  } else {
+    return string.at(0).toUpperCase().concat(string.slice(1).toLowerCase());
+  }
 }

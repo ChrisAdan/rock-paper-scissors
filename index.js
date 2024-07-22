@@ -119,7 +119,8 @@ function resetCommonGameElements() {
   updateScore("player");
   updateScore("ai");
   clearRoundReport();
-  createMoveHistory();
+  initializeMoveHistory();
+  initializeStatistics();
 }
 function ensurePlayerName() {
   if (!playerName) {
@@ -215,15 +216,25 @@ function clearRoundReport() {
   const roundReportElement = document.querySelector(".round-report");
   roundReportElement.textContent = "";
 }
-function createMoveHistory() {
+function initializeMoveHistory() {
   // Get reference to div where table will live
   const tableDiv = document.querySelector("#move-history");
   // Function to create and return Table element
   const trackerTable = constructTrackerTable();
   tableDiv.appendChild(trackerTable);
 }
+
+function initializeStatistics() {
+  const types = ["win", "loss"];
+  types.forEach((type) => {
+    const tableDiv = document.querySelector(`#${type}-history`);
+    console.log(tableDiv);
+    const newTable = constructStatsTable(type);
+    tableDiv.appendChild(newTable);
+  });
+}
 function constructTrackerTable() {
-  eraseExistingTable();
+  eraseExistingTable("#move-history-table");
   const trackerTable = document.createElement("table");
   // Function to create and return table headers
   const trackerTableHead = constructTableHeaders();
@@ -231,8 +242,8 @@ function constructTrackerTable() {
   trackerTable.setAttribute("id", "move-history-table");
   return trackerTable;
 }
-function eraseExistingTable() {
-  const existingTable = document.querySelector("#move-history-table");
+function eraseExistingTable(selector) {
+  const existingTable = document.querySelector(selector);
   if (existingTable) {
     existingTable.remove();
   }
@@ -245,7 +256,7 @@ function constructTableHeaders() {
     let newCol;
     if (["Selection", "Score"].includes(header)) {
       newCol = document.createElement("colgroup");
-      newCol.setAttribute("span", 2);
+      newCol.setAttribute("span", "2");
     } else {
       newCol = document.createElement("col");
     }
@@ -294,6 +305,69 @@ function createTableSubheadPair(subHeaders) {
     resultElements.push(newHeader);
   });
   return resultElements;
+}
+
+function constructStatsTable(type) {
+  eraseExistingTable(`#${type}-history-table`);
+  const newTable = document.createElement("table");
+  // Function to create and return table headers
+  const newTableHeaders = constructStatsTableHeaders(type);
+  newTable.appendChild(newTableHeaders);
+  newTable.setAttribute("id", `${type}-history-table`);
+  return newTable;
+}
+
+function constructStatsTableHeaders(type) {
+  const newTableHead = document.createElement("thead");
+  const headers = ["Selection", "Win Count", "Player Win Rate (%)"];
+  // For each header, create col element and append to parent thead
+  headers.forEach((header) => {
+    let newCol;
+    if (["Selection"].includes(header)) {
+      newCol = document.createElement("colgroup");
+      newCol.setAttribute("span", "2");
+    } else {
+      newCol = document.createElement("col");
+    }
+    newTableHead.appendChild(newCol);
+  });
+
+  // Construct TR 1 - top level headers
+  const headerRow = createStatsTableHeaderRow(headers);
+  newTableHead.appendChild(headerRow);
+
+  // Construct TR 2 - top level headers
+  const subHeaderRow = createStatsTableSubHeaders();
+  newTableHead.appendChild(subHeaderRow);
+  return newTableHead;
+}
+
+function createStatsTableHeaderRow(headers) {
+  const headerRow = document.createElement("tr");
+  headers.forEach((header) => {
+    let newCol = document.createElement("th");
+    if (["Win Count"].includes(header)) {
+      newCol.setAttribute("colspan", "2");
+    } else {
+      newCol.setAttribute("rowspan", "2");
+    }
+    newCol.setAttribute("scope", "col");
+    newCol.textContent = toTitleCase(header);
+    headerRow.appendChild(newCol);
+  });
+  return headerRow;
+}
+
+function createStatsTableSubHeaders() {
+  const subHeaderRow = document.createElement("tr");
+  const subHeaders = ["Player", "AI"];
+  subHeaders.forEach((subHeader) => {
+    newCol = document.createElement("th");
+    newCol.setAttribute("scope", "col");
+    newCol.textContent = subHeader;
+    subHeaderRow.appendChild(newCol);
+  });
+  return subHeaderRow;
 }
 
 function hideHiddenElements() {

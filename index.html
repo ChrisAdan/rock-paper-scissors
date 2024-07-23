@@ -10,7 +10,9 @@
   <header>
     <nav class="navbar">
       <div class="brand">rps.io</div>
-      <div>Round: <span class="round-counter"></span></div>
+      <div class="round-counter-container">
+        Round: <span class="round-counter"></span>
+      </div>
       <ul class="navmenu">
         <li>
           <button id="toggle-history"><span>Show</span> History</button>
@@ -24,9 +26,12 @@
   </header>
   <body>
     <section class="score-counters">
-      <div><span class="player-name"></span>: <span class="player"></span></div>
+      <div class="player-score-counter">
+        <span class="player-name"></span>:
+        <span class="player"></span>
+      </div>
       <div class="round-report"></div>
-      <div>AI: <span class="ai"></span></div>
+      <div class="ai-score-counter">AI: <span class="ai"></span></div>
     </section>
     <section class="selection-cards">
       <div class="weapon-row">
@@ -35,6 +40,10 @@
         <div class="weapon" id="scissors">Scissors</div>
       </div>
       <div class="headline"><h1>What will you do...?</h1></div>
+      <div class="welcome-screen">
+        <button class="start-game-button">Care to try...?</button>
+        <h1>There is power in reason...</h1>
+      </div>
     </section>
     <section class="analytics">
       <div class="analytics-container">

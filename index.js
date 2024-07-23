@@ -19,6 +19,12 @@ const cards = document.querySelectorAll(".weapon");
 cards.forEach((selection) => {
   selection.addEventListener("click", () => {
     ensurePlayerName();
+    const scoreCounters = document.querySelectorAll(
+      `[class*='-score-counter']`
+    );
+    scoreCounters.forEach((scoreCounter) => {
+      fadeIn(scoreCounter);
+    });
     const roundInputs = generateRoundInputs(selection);
     const roundWinner = playRound(roundInputs);
     updateRoundCounter();
@@ -103,7 +109,9 @@ function createNewScoreData() {
 }
 function initializeGame() {
   resetCommonGameElements();
-  hideHiddenElements();
+  hideGameElements();
+  const hiddenUI = hideUI();
+  setupPlayButton(hiddenUI);
 }
 function resetCommonGameElements() {
   playerScore = 0;
@@ -116,6 +124,58 @@ function resetCommonGameElements() {
   clearRoundReport();
   initializeMoveHistory();
   initializeStatistics();
+}
+function hideUI() {
+  const elements = [];
+  const navmenu = document.querySelector(".navmenu");
+  elements.push(navmenu);
+  const weaponRow = document.querySelector(".weapon-row");
+  elements.push(weaponRow);
+  const headline = document.querySelector(".headline");
+  elements.push(headline);
+  elements.forEach((element) => {
+    hideElement(element);
+  });
+  return elements;
+}
+function setupPlayButton(ui) {
+  const startGameButton = document.querySelector(".start-game-button");
+  startGameButton.addEventListener("click", () => {
+    revealInterface(startGameButton, ui);
+    const welcomeText = document.querySelector(".welcome-screen h1");
+    hideElement(welcomeText);
+  });
+}
+function revealInterface(button, ui) {
+  hideElement(button);
+  ui.forEach((element) => {
+    fadeIn(element);
+  });
+}
+
+function fadeIn(element) {
+  showElement(element);
+  if (element.classList.contains("fadeout")) {
+    element.classList.replace("fadeout", "fadein");
+  } else {
+    element.classList.add("fadein");
+  }
+}
+
+// Working on this
+function fadeOut(element) {
+  if (element.classList.contains("fadein")) {
+    element.classList.replace("fadein", "fadeout");
+  } else {
+    element.classList.add("fadeout");
+  }
+}
+
+function showElement(element) {
+  element.classList.remove("hide");
+}
+function hideElement(element) {
+  element.classList.add("hide");
 }
 function ensurePlayerName() {
   if (!playerName) {
@@ -224,6 +284,7 @@ function generateNewRoundRecord(roundWinner, roundInputs) {
 }
 function generateRoundReport(winner, choices) {
   const roundReportElement = document.querySelector(".round-report");
+  fadeOut(roundReportElement);
   if (winner === "player") {
     roundReportElement.textContent = `${playerName} wins, ${choices.playerChoice} beats ${choices.computerChoice}`;
     updateStatistics(winner, choices.playerChoice, choices.computerChoice);
@@ -235,9 +296,8 @@ function generateRoundReport(winner, choices) {
       choices.playerChoice || choices.computerChoice
     }`;
   }
+  fadeIn(roundReportElement);
 }
-
-// TO DO: FIND WAY TO UPDATE WIN/LOSS RATE AS PART OF UPDATE
 function updateStatistics(winner, winChoice, loseChoice) {
   const loser = winner === "player" ? "ai" : "player";
   const winRecord = document.querySelector(
@@ -447,7 +507,7 @@ function createStatsTableBody(type) {
 }
 
 function calculateRate(choice, type) {
-  let rewRate;
+  let newRate;
   newRate = Math.round(
     (statistics["player"][choice.toLowerCase()][type] /
       (statistics["player"][choice.toLowerCase()][type] +
@@ -456,8 +516,12 @@ function calculateRate(choice, type) {
   );
   return newRate;
 }
-function hideHiddenElements() {
+function hideGameElements() {
   const elements = [];
+  const roundCounter = document.querySelector(".round-counter-container");
+  elements.push(roundCounter);
+  const roundReport = document.querySelector(".round-report");
+  elements.push(roundReport);
   const tableContainer = document.querySelector("#move-history-container");
   elements.push(tableContainer);
   const winStatsContainer = document.querySelector(
@@ -468,19 +532,19 @@ function hideHiddenElements() {
     ".analytics-card#loss-history-container"
   );
   elements.push(lossStatsContainer);
+  const scoreCounters = document.querySelectorAll("[class*= '-score-counter']");
+  scoreCounters.forEach((scoreCounter) => {
+    elements.push(scoreCounter);
+  });
   elements.forEach((element) => {
     hideElement(element);
   });
+  return elements;
 }
-function showElement(element) {
-  element.classList.remove("hide");
-}
-function hideElement(element) {
-  element.classList.add("hide");
-}
+
 function toggleVisibility(element) {
   if (isHidden(element)) {
-    showElement(element);
+    fadeIn(element);
   } else {
     hideElement(element);
   }

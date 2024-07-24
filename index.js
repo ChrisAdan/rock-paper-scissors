@@ -1,10 +1,11 @@
-const NUMROUNDS = 1;
+const NUMROUNDS = 7;
 const CHOICES = ["Rock", "Paper", "Scissors"];
 let playerName;
 let playerScore;
 let computerScore;
 let currentRound;
 let statistics;
+let gameCount = 1;
 document.addEventListener("DOMContentLoaded", initializeGame);
 
 // Button to start game
@@ -14,7 +15,11 @@ playButton.addEventListener("click", () => {
   ensurePlayerName();
 });
 
+function playRound(selection) {}
+
 // Click card to play round
+
+// TODO - remove event listener, duplicates replay button on rapid click
 const cards = document.querySelectorAll(".weapon");
 cards.forEach((selection) => {
   selection.addEventListener("click", () => {
@@ -26,7 +31,7 @@ cards.forEach((selection) => {
       fadeIn(scoreCounter);
     });
     const roundInputs = generateRoundInputs(selection);
-    const roundWinner = playRound(roundInputs);
+    const roundWinner = getRoundWinner(roundInputs);
     updateRoundCounter();
     if (roundWinner) {
       updateScoreCounter(roundWinner);
@@ -35,6 +40,10 @@ cards.forEach((selection) => {
     // Function for appending row to Move History table
     appendRoundRecordToHistory(roundWinner, roundInputs);
     currentRound += 1;
+    if (currentRound > NUMROUNDS) {
+      cleanup();
+      // selection.removeEventListener("click", playRound);
+    }
   });
 });
 
@@ -101,6 +110,7 @@ function initializeGame() {
   hideGameElements();
   const hiddenUI = hideUI();
   setupPlayButton(hiddenUI);
+  greetPlayer();
 }
 function resetCommonGameElements() {
   playerScore = 0;
@@ -129,6 +139,11 @@ function hideUI() {
 }
 function setupPlayButton(ui) {
   const startGameButton = document.querySelector(".start-game-button");
+  if (gameCount === 1) {
+    startGameButton.textContent = "Care to try...?";
+  } else {
+    startGameButton.textContent = "Another round...?";
+  }
   startGameButton.addEventListener("click", () => {
     revealInterface(startGameButton, ui);
     const welcomeText = document.querySelector(".welcome-screen h1");
@@ -138,8 +153,75 @@ function setupPlayButton(ui) {
 function revealInterface(button, ui) {
   hideElement(button);
   ui.forEach((element) => {
-    fadeIn(element);
+    if (element.classList.contains("weapon-row")) {
+      setTimeout(() => {
+        fadeIn(element);
+      }, 1000);
+    } else if (element.classList.contains("headline")) {
+      setTimeout(() => {
+        fadeIn(element);
+      }, 1500);
+    } else {
+      fadeIn(element);
+    }
   });
+}
+function greetPlayer() {
+  const greeting = document.querySelector(".welcome-screen h1");
+  if (gameCount === 1) {
+    greeting.textContent = "There is power in reason";
+  } else {
+    greeting.textContent = "So you're back again";
+  }
+  fadeIn(greeting);
+  const startButton = document.querySelector(".start-game-button");
+  fadeIn(startButton);
+}
+function cleanup() {
+  const elements = [];
+  elements.push(document.querySelector(".round-report"));
+  elements.push(document.querySelector(".weapon-row"));
+  elements.push(document.querySelector(".headline"));
+  elements.forEach((element) => {
+    fadeOut(element);
+  });
+  setTimeout(() => {
+    const analytics = document.querySelector(".analytics");
+    const scoreCounters = document.querySelector(".score-counters");
+    scoreCounters.parentNode.insertBefore(analytics, scoreCounters);
+    document.querySelectorAll(".analytics-card").forEach((card) => {
+      fadeIn(card);
+    });
+  }, 2000);
+  sayGoodbye();
+  analytics.parentNode.insertBefore(scoreCounters, analytics);
+}
+function sayGoodbye() {
+  gameCount += 1;
+  const goodbyeText = document.querySelector(".goodbye-text");
+  const winStatement =
+    playerScore > computerScore
+      ? "won this time"
+      : playerScore < computerScore
+      ? "weren't able to find your way"
+      : "met your match today";
+  const playAgain = document.createElement("button");
+  playAgain.textContent = "Once more?";
+  hideElement(playAgain);
+  playAgain.setAttribute("id", "replay-button");
+  playAgain.addEventListener("click", () => {
+    fadeOut(goodbyeText);
+    fadeOut(playAgain);
+    initializeGame();
+  });
+  setTimeout(() => {
+    goodbyeText.textContent = `Thanks for dropping by, ${playerName}. Looks like you ${winStatement}.`;
+    fadeIn(goodbyeText);
+    setTimeout(() => {
+      goodbyeText.parentNode.appendChild(playAgain);
+      fadeIn(playAgain);
+    }, 1000);
+  }, 2000);
 }
 
 function fadeIn(element) {
@@ -151,7 +233,6 @@ function fadeIn(element) {
   }
 }
 
-// Working on this
 function fadeOut(element) {
   if (element.classList.contains("fadein")) {
     element.classList.replace("fadein", "fadeout");
@@ -184,7 +265,7 @@ function ensurePlayerName() {
 }
 function getPlayerName() {
   const playerName = prompt("Enter a Name for your Player");
-  return playerName;
+  return playerName || "unknown stranger";
 }
 function setupPlayer(name) {
   const playerNameElement = document.querySelector(".player-name");
@@ -203,7 +284,7 @@ function getComputerChoice() {
   let computerChoice = CHOICES[randomSelection];
   return computerChoice;
 }
-function playRound(choices) {
+function getRoundWinner(choices) {
   if (choices.playerChoice === choices.computerChoice) {
     // Tie
     return false;
@@ -286,18 +367,31 @@ function generateNewRoundRecord(roundWinner, roundInputs) {
 function generateRoundReport(winner, choices) {
   const roundReportElement = document.querySelector(".round-report");
   fadeOut(roundReportElement);
-  if (winner === "player") {
-    roundReportElement.textContent = `${playerName} wins, ${choices.playerChoice} beats ${choices.computerChoice}`;
-    updateStatistics(winner, choices.playerChoice, choices.computerChoice);
-  } else if (winner === "ai") {
-    roundReportElement.textContent = `AI wins, ${choices.computerChoice} beats ${choices.playerChoice}`;
-    updateStatistics(winner, choices.computerChoice, choices.playerChoice);
-  } else if (!winner) {
-    roundReportElement.textContent = `It's a tie! Both sides chose ${
-      choices.playerChoice || choices.computerChoice
-    }`;
+  setTimeout(() => {
+    if (winner === "player") {
+      roundReportElement.textContent = `${playerName} wins, ${choices.playerChoice} beats ${choices.computerChoice}`;
+      updateStatistics(winner, choices.playerChoice, choices.computerChoice);
+    } else if (winner === "ai") {
+      roundReportElement.textContent = `AI wins, ${choices.computerChoice} beats ${choices.playerChoice}`;
+      updateStatistics(winner, choices.computerChoice, choices.playerChoice);
+    } else if (!winner) {
+      roundReportElement.textContent = `It's a tie! Both sides chose ${
+        choices.playerChoice || choices.computerChoice
+      }`;
+    }
+    // toggleVisibility(roundReportElement);
+    fadeIn(roundReportElement);
+  }, 2000);
+  const historyButton = document.querySelector("#toggle-history");
+  if (isHidden(historyButton)) {
+    fadeIn(historyButton);
   }
-  fadeIn(roundReportElement);
+  const roundCounter = document.querySelector(".round-counter-container");
+  if (isHidden(roundCounter)) {
+    setTimeout(() => {
+      fadeIn(roundCounter);
+    }, 750);
+  }
 }
 function updateStatistics(winner, winChoice, loseChoice) {
   const loser = winner === "player" ? "ai" : "player";

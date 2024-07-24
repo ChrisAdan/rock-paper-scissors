@@ -97,6 +97,7 @@ section {
 
 .analytics {
   padding: 50px 5vw;
+  transition: all 2s;
 }
 
 .analytics-container {

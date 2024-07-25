@@ -207,9 +207,9 @@ function sayGoodbye() {
     fadeOut(goodbyeText);
     fadeOut(playAgain);
     setTimeout(() => {
-      const selectionCards = document.querySelector(".selection-cards");
-      const scoreCounters = document.querySelector(".score-counters");
-      selectionCards.parentNode.insertBefore(scoreCounters, selectionCards);
+      const goodbye = document.querySelector(".goodbye");
+      const analytics = document.querySelector(".analytics");
+      goodbye.parentNode.insertBefore(analytics, goodbye);
       initializeGame();
     }, 750);
   });

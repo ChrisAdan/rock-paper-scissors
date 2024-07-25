@@ -15,37 +15,28 @@ playButton.addEventListener("click", () => {
   ensurePlayerName();
 });
 
-function playRound(selection) {}
-
-// Click card to play round
-
-// TODO - remove event listener, duplicates replay button on rapid click
-const cards = document.querySelectorAll(".weapon");
-cards.forEach((selection) => {
-  selection.addEventListener("click", () => {
-    ensurePlayerName();
-    const scoreCounters = document.querySelectorAll(
-      `[class*='-score-counter']`
-    );
-    scoreCounters.forEach((scoreCounter) => {
-      fadeIn(scoreCounter);
-    });
-    const roundInputs = generateRoundInputs(selection);
-    const roundWinner = getRoundWinner(roundInputs);
-    updateRoundCounter();
-    if (roundWinner) {
-      updateScoreCounter(roundWinner);
-    }
-    generateRoundReport(roundWinner, roundInputs);
-    // Function for appending row to Move History table
-    appendRoundRecordToHistory(roundWinner, roundInputs);
-    currentRound += 1;
-    if (currentRound > NUMROUNDS) {
-      cleanup();
-      // selection.removeEventListener("click", playRound);
-    }
+let playRound = (selection) => {
+  // console.log("called playRound");
+  ensurePlayerName();
+  const scoreCounters = document.querySelectorAll(`[class*='-score-counter']`);
+  scoreCounters.forEach((scoreCounter) => {
+    fadeIn(scoreCounter);
   });
-});
+  const roundInputs = generateRoundInputs(selection.target);
+  const roundWinner = getRoundWinner(roundInputs);
+  updateRoundCounter();
+  if (roundWinner) {
+    updateScoreCounter(roundWinner);
+  }
+  generateRoundReport(roundWinner, roundInputs);
+  // Function for appending row to Move History table
+  appendRoundRecordToHistory(roundWinner, roundInputs);
+  currentRound += 1;
+  if (currentRound > NUMROUNDS) {
+    selection.target.removeEventListener("click", playRound);
+    cleanup();
+  }
+};
 
 // Button to Toggle History display
 const historyButton = document.querySelector("#toggle-history");
@@ -109,6 +100,10 @@ function initializeGame() {
   resetCommonGameElements();
   hideGameElements();
   const hiddenUI = hideUI();
+  const cards = document.querySelectorAll(".weapon");
+  cards.forEach((selection) => {
+    selection.addEventListener("click", playRound);
+  });
   setupPlayButton(hiddenUI);
   greetPlayer();
 }
@@ -185,9 +180,9 @@ function cleanup() {
   elements.forEach((element) => {
     fadeOut(element);
   });
+  const analytics = document.querySelector(".analytics");
+  const scoreCounters = document.querySelector(".score-counters");
   setTimeout(() => {
-    const analytics = document.querySelector(".analytics");
-    const scoreCounters = document.querySelector(".score-counters");
     scoreCounters.parentNode.insertBefore(analytics, scoreCounters);
     document.querySelectorAll(".analytics-card").forEach((card) => {
       fadeIn(card);
@@ -212,7 +207,9 @@ function sayGoodbye() {
   playAgain.addEventListener("click", () => {
     fadeOut(goodbyeText);
     fadeOut(playAgain);
-    initializeGame();
+    setTimeout(() => {
+      initializeGame();
+    }, 750);
   });
   setTimeout(() => {
     goodbyeText.textContent = `Thanks for dropping by, ${playerName}. Looks like you ${winStatement}.`;

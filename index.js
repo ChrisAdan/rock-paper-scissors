@@ -208,6 +208,9 @@ function sayGoodbye() {
     fadeOut(goodbyeText);
     fadeOut(playAgain);
     setTimeout(() => {
+      const selectionCards = document.querySelector(".selection-cards");
+      const scoreCounters = document.querySelector(".score-counters");
+      selectionCards.parentNode.insertBefore(scoreCounters, selectionCards);
       initializeGame();
     }, 750);
   });

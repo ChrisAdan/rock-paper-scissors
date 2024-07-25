@@ -189,7 +189,6 @@ function cleanup() {
     });
   }, 2000);
   sayGoodbye();
-  analytics.parentNode.insertBefore(scoreCounters, analytics);
 }
 function sayGoodbye() {
   gameCount += 1;
@@ -198,7 +197,7 @@ function sayGoodbye() {
     playerScore > computerScore
       ? "won this time"
       : playerScore < computerScore
-      ? "weren't able to find your way"
+      ? "couldn't quite find your way"
       : "met your match today";
   const playAgain = document.createElement("button");
   playAgain.textContent = "Once more?";

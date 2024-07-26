@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", initializeGame);
 // Button to start game
 const playButton = document.querySelector("#start-game");
 playButton.addEventListener("click", () => {
-  if (currentRound >= 1) {
+  if (currentRound > 1) {
     alert("A rash decision. The wheels yet remain in motion.");
   } else {
     resetCommonGameElements();
@@ -115,6 +115,8 @@ function initializeGame() {
   const cards = getCards();
   cards.forEach((selection) => {
     selection.addEventListener("click", playRound);
+    selection.addEventListener("mouseenter", addHighlight);
+    selection.addEventListener("mouseleave", removeHighlight);
   });
   setupPlayButton(hiddenUI);
   greetPlayer();
@@ -123,6 +125,16 @@ function getCards() {
   const cards = document.querySelectorAll(".weapon");
   return cards;
 }
+const addHighlight = (selection) => {
+  const iconType = selection.target.getAttribute("id");
+  const icon = document.querySelector(`.${iconType}-icon`);
+  icon.classList.add("highlight");
+};
+const removeHighlight = (selection) => {
+  const iconType = selection.target.getAttribute("id");
+  const icon = document.querySelector(`.${iconType}-icon`);
+  icon.classList.remove("highlight");
+};
 function resetCommonGameElements() {
   playerScore = 0;
   computerScore = 0;
@@ -179,9 +191,10 @@ function revealInterface(button, ui) {
 function greetPlayer() {
   const greeting = document.querySelector(".welcome-screen h1");
   if (gameCount === 1) {
-    greeting.textContent = "There is power in reason";
+    greeting.textContent =
+      "Greetings, traveler. May you find power in realms of reason";
   } else {
-    greeting.textContent = "So you're back again";
+    greeting.textContent = "So, you're back again";
   }
   fadeIn(greeting);
   const startButton = document.querySelector(".start-game-button");

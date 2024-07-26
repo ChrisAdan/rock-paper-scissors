@@ -15,6 +15,11 @@ html {
   font-family: "Roboto Condensed", sans-serif;
   font-weight: 300;
   font-style: normal;
+  /* background-image: url(img/background-maze.svg); */
+  background-image: url(img/background-grid.svg);
+  background-size: cover;
+  background-color: black;
+  color: white;
 }
 
 body {
@@ -31,6 +36,10 @@ ul {
 
 button {
   padding: 10px 20px;
+}
+button:hover,
+.weapon:hover {
+  cursor: pointer;
 }
 
 header {
@@ -53,7 +62,14 @@ table {
 section {
   padding: 0 15vw;
 }
-
+svg {
+  width: 5rem;
+}
+.brand {
+  font-size: 2rem;
+  font-weight: 750;
+  opacity: 0.9;
+}
 .footer {
   padding: 15px;
   display: flex;
@@ -62,7 +78,6 @@ section {
 }
 .navbar {
   padding-bottom: 12px;
-  border-bottom: 1px solid black;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -71,6 +86,8 @@ section {
   padding: 30px 20vw;
   display: flex;
   justify-content: space-between;
+  font-size: 2rem;
+  font-weight: 900;
 }
 .selection-cards {
   display: flex;
@@ -83,6 +100,7 @@ section {
 .weapon-row {
   padding: 16px;
   display: flex;
+  justify-content: space-evenly;
   gap: 10px;
   min-width: 75%;
   overflow: hidden;
@@ -91,8 +109,27 @@ section {
 .weapon {
   padding: 15px;
   flex: 1;
-  height: 250px;
-  border: 1px solid black;
+  min-height: 250px;
+  border: 1px solid white;
+  max-width: 15vw;
+  background-color: white;
+  color: black;
+  border-radius: 15px;
+}
+
+.weapon-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.weapon-content-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.headline {
+  font-size: 3rem;
 }
 
 .analytics {
@@ -161,6 +198,11 @@ section {
   animation: fadein 2s;
 }
 
+.highlight {
+  animation: color-on-hover 1s;
+  color: #d51010;
+}
+
 @keyframes fadein {
   from {
     opacity: 0;
@@ -176,5 +218,14 @@ section {
   }
   to {
     opacity: 0;
+  }
+}
+
+@keyframes color-on-hover {
+  from {
+    color: black;
+  }
+  to {
+    color: #d51010;
   }
 }

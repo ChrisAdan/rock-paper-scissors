@@ -11,8 +11,12 @@ document.addEventListener("DOMContentLoaded", initializeGame);
 // Button to start game
 const playButton = document.querySelector("#start-game");
 playButton.addEventListener("click", () => {
-  resetCommonGameElements();
-  ensurePlayerName();
+  if (currentRound >= 1) {
+    alert("A rash decision. The wheels yet remain in motion.");
+  } else {
+    resetCommonGameElements();
+    ensurePlayerName();
+  }
 });
 
 let playRound = (selection) => {
@@ -33,10 +37,17 @@ let playRound = (selection) => {
   appendRoundRecordToHistory(roundWinner, roundInputs);
   currentRound += 1;
   if (currentRound > NUMROUNDS) {
-    selection.target.removeEventListener("click", playRound);
+    removeAllClickEventListeners();
     cleanup();
   }
 };
+
+function removeAllClickEventListeners() {
+  const cards = getCards();
+  cards.forEach((card) => {
+    card.removeEventListener("click", playRound);
+  });
+}
 
 // Button to Toggle History display
 const historyButton = document.querySelector("#toggle-history");
@@ -97,21 +108,25 @@ function createNewScoreData() {
   return stats;
 }
 function initializeGame() {
+  statistics = statistics || createNewScoreData();
   resetCommonGameElements();
   hideGameElements();
   const hiddenUI = hideUI();
-  const cards = document.querySelectorAll(".weapon");
+  const cards = getCards();
   cards.forEach((selection) => {
     selection.addEventListener("click", playRound);
   });
   setupPlayButton(hiddenUI);
   greetPlayer();
 }
+function getCards() {
+  const cards = document.querySelectorAll(".weapon");
+  return cards;
+}
 function resetCommonGameElements() {
   playerScore = 0;
   computerScore = 0;
   currentRound = 1;
-  statistics = createNewScoreData();
   updateRoundCounter();
   updateScoreCounter("player");
   updateScoreCounter("ai");
@@ -177,6 +192,8 @@ function cleanup() {
   elements.push(document.querySelector(".round-report"));
   elements.push(document.querySelector(".weapon-row"));
   elements.push(document.querySelector(".headline"));
+  elements.push(document.querySelector("#start-game"));
+  elements.push(document.querySelector("#toggle-history"));
   elements.forEach((element) => {
     fadeOut(element);
   });
@@ -199,7 +216,9 @@ function sayGoodbye() {
       : playerScore < computerScore
       ? "couldn't quite find your way"
       : "met your match today";
-  const playAgain = document.createElement("button");
+  const playAgain =
+    document.querySelector("#replay-button") ||
+    document.createElement("button");
   playAgain.textContent = "Once more?";
   hideElement(playAgain);
   playAgain.setAttribute("id", "replay-button");
@@ -354,7 +373,7 @@ function generateNewRoundRecord(roundWinner, roundInputs) {
       if (!value) {
         rowData.textContent = "Tie";
       } else {
-        rowData.textContent = toTitleCase(value);
+        rowData.textContent = toTitleCase(value.replace("ai", "machine"));
       }
     } else {
       rowData.textContent = value;
@@ -371,7 +390,7 @@ function generateRoundReport(winner, choices) {
       roundReportElement.textContent = `${playerName} wins, ${choices.playerChoice} beats ${choices.computerChoice}`;
       updateStatistics(winner, choices.playerChoice, choices.computerChoice);
     } else if (winner === "ai") {
-      roundReportElement.textContent = `AI wins, ${choices.computerChoice} beats ${choices.playerChoice}`;
+      roundReportElement.textContent = `The machine wins, ${choices.computerChoice} beats ${choices.playerChoice}`;
       updateStatistics(winner, choices.computerChoice, choices.playerChoice);
     } else if (!winner) {
       roundReportElement.textContent = `It's a tie! Both sides chose ${
@@ -487,7 +506,7 @@ function createTableHeaderRow(headers) {
 }
 function createTableSubHeaderRow() {
   const headerRow = document.createElement("tr");
-  const subHeaders = ["Player", "AI"];
+  const subHeaders = ["Player", "Machine"];
   const rowPairs = ["Selection", "Winner"];
   rowPairs.forEach(() => {
     const newHeaders = createTableSubheadPair(subHeaders);
@@ -561,7 +580,7 @@ function createStatsTableHeaderRow(type, headers) {
 }
 function createStatsTableSubHeaders() {
   const subHeaderRow = document.createElement("tr");
-  const subHeaders = ["Player", "AI"];
+  const subHeaders = ["Player", "Machine"];
   subHeaders.forEach((subHeader) => {
     newCol = document.createElement("th");
     newCol.setAttribute("scope", "col");

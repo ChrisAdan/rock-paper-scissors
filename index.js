@@ -8,17 +8,6 @@ let statistics;
 let gameCount = 1;
 document.addEventListener("DOMContentLoaded", initializeGame);
 
-// Button to start game
-const playButton = document.querySelector("#start-game");
-playButton.addEventListener("click", () => {
-  if (currentRound > 1) {
-    alert("A rash decision. The wheels yet remain in motion.");
-  } else {
-    resetCommonGameElements();
-    ensurePlayerName();
-  }
-});
-
 let playRound = (selection) => {
   ensurePlayerName();
   const scoreCounters = document.querySelectorAll(`[class*='-score-counter']`);
@@ -200,7 +189,7 @@ function revealInterface(button, ui) {
 function greetPlayer() {
   const greeting = document.querySelector(".welcome-screen h1");
   if (gameCount === 1) {
-    greeting.textContent = "Greetings, traveler. Come, stay a while";
+    greeting.textContent = "Greetings, traveler. Come, stay a while..";
   } else {
     greeting.textContent = "So, you're back again";
   }
@@ -213,7 +202,6 @@ function cleanup() {
   elements.push(document.querySelector(".round-report"));
   elements.push(document.querySelector(".weapon-row"));
   elements.push(document.querySelector(".headline"));
-  elements.push(document.querySelector("#start-game"));
   elements.push(document.querySelector("#toggle-history"));
   elements.forEach((element) => {
     fadeOut(element);

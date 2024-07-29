@@ -20,13 +20,12 @@ playButton.addEventListener("click", () => {
 });
 
 let playRound = (selection) => {
-  // console.log("called playRound");
   ensurePlayerName();
   const scoreCounters = document.querySelectorAll(`[class*='-score-counter']`);
   scoreCounters.forEach((scoreCounter) => {
     fadeIn(scoreCounter);
   });
-  const roundInputs = generateRoundInputs(selection.target);
+  const roundInputs = generateRoundInputs(selection);
   const roundWinner = getRoundWinner(roundInputs);
   updateRoundCounter();
   if (roundWinner) {
@@ -41,7 +40,17 @@ let playRound = (selection) => {
     cleanup();
   }
 };
-
+function generateRoundInputs(selection) {
+  let roundInputs = {};
+  console.log(
+    `generate round inputs current target ${selection.currentTarget}`
+  );
+  let currentChoice = selection.currentTarget.getAttribute("id");
+  currentChoice = toTitleCase(currentChoice);
+  roundInputs.playerChoice = currentChoice;
+  roundInputs.computerChoice = getComputerChoice();
+  return roundInputs;
+}
 function removeAllClickEventListeners() {
   const cards = getCards();
   cards.forEach((card) => {
@@ -113,10 +122,10 @@ function initializeGame() {
   hideGameElements();
   const hiddenUI = hideUI();
   const cards = getCards();
-  cards.forEach((selection) => {
-    selection.addEventListener("click", playRound);
-    selection.addEventListener("mouseenter", addHighlight);
-    selection.addEventListener("mouseleave", removeHighlight);
+  cards.forEach((card) => {
+    card.addEventListener("click", playRound);
+    card.addEventListener("mouseenter", addHighlight);
+    card.addEventListener("mouseleave", removeHighlight);
   });
   setupPlayButton(hiddenUI);
   greetPlayer();
@@ -162,7 +171,7 @@ function hideUI() {
 function setupPlayButton(ui) {
   const startGameButton = document.querySelector(".start-game-button");
   if (gameCount === 1) {
-    startGameButton.textContent = "Care to try...?";
+    startGameButton.textContent = "What is this place...?";
   } else {
     startGameButton.textContent = "Another round...?";
   }
@@ -191,8 +200,7 @@ function revealInterface(button, ui) {
 function greetPlayer() {
   const greeting = document.querySelector(".welcome-screen h1");
   if (gameCount === 1) {
-    greeting.textContent =
-      "Greetings, traveler. May you find power in realms of reason";
+    greeting.textContent = "Greetings, traveler. Come, stay a while";
   } else {
     greeting.textContent = "So, you're back again";
   }
@@ -302,14 +310,7 @@ function setupPlayer(name) {
   const playerNameElement = document.querySelector(".player-name");
   playerNameElement.textContent = name;
 }
-function generateRoundInputs(selection) {
-  let roundInputs = {};
-  let currentChoice = selection.getAttribute("id");
-  currentChoice = toTitleCase(currentChoice);
-  roundInputs.playerChoice = currentChoice;
-  roundInputs.computerChoice = getComputerChoice();
-  return roundInputs;
-}
+
 function getComputerChoice() {
   let randomSelection = Math.floor(Math.random() * 100) % 3;
   let computerChoice = CHOICES[randomSelection];

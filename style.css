@@ -17,7 +17,6 @@ html {
   font-style: normal;
   /* background-image: url(img/background-maze.svg); */
   background-image: url(img/background-grid.svg);
-  background-size: cover;
   background-color: black;
   color: white;
 }
@@ -35,8 +34,20 @@ ul {
 }
 
 button {
-  padding: 10px 20px;
+  padding: 20px 30px;
+  font-size: 1.6rem;
+  border-radius: 20px;
+  border: 1px solid #c4c4c4;
+  font-weight: 900;
+  color: black;
+  background-color: #c4c4c4;
 }
+#toggle-history {
+  font-weight: 300;
+  font-size: 1rem;
+  padding: 10px 15px;
+}
+
 button:hover,
 .weapon:hover {
   cursor: pointer;
@@ -46,18 +57,26 @@ header {
   margin: 10px;
   padding: 10px;
 }
-table,
-thead,
-tbody,
-th,
-tr,
-td,
-tfoot {
-  border: 1px solid black;
+thead 
+/* tbody, */
+th, thead tr {
+  border-bottom: 2px solid black;
+  border-radius: 12px;
+  padding: 4px 8px;
+}
+td {
+  padding: 6px;
+}
+tbody th {
+  border-right: 1px solid black;
 }
 table {
   width: 100%;
   text-align: center;
+  background-color: #c4c4c4;
+  color: black;
+  border-collapse: collapse;
+  border-radius: 12px;
 }
 section {
   padding: 0 15vw;
@@ -69,6 +88,9 @@ svg {
   font-size: 2rem;
   font-weight: 750;
   opacity: 0.9;
+}
+.round-counter-container {
+  font-size: 1.9rem;
 }
 .footer {
   padding: 15px;
@@ -129,7 +151,7 @@ svg {
 }
 
 .headline {
-  font-size: 3rem;
+  font-size: 2rem;
 }
 
 .analytics {
@@ -170,9 +192,7 @@ svg {
   animation: fadein 2s;
 }
 .welcome-screen button {
-  /* flex: 0; */
   align-self: center;
-  /* opacity: 0; */
   animation: fadein 8s;
 }
 
@@ -189,6 +209,9 @@ svg {
   align-items: center;
   justify-content: space-between;
   gap: 64px;
+}
+.goodbye-text {
+  font-size: 2rem;
 }
 
 .fadeout {
@@ -228,4 +251,17 @@ svg {
   to {
     color: #d51010;
   }
+}
+
+@keyframes swell {
+  from {
+    font-size: 1.5rem;
+  }
+  to {
+    font-size: 1.75rem;
+  }
+}
+.weapon:hover h2 {
+  animation: swell 1s;
+  font-size: 1.75rem;
 }

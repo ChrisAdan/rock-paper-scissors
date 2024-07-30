@@ -31,9 +31,6 @@ let playRound = (selection) => {
 };
 function generateRoundInputs(selection) {
   let roundInputs = {};
-  console.log(
-    `generate round inputs current target ${selection.currentTarget}`
-  );
   let currentChoice = selection.currentTarget.getAttribute("id");
   currentChoice = toTitleCase(currentChoice);
   roundInputs.playerChoice = currentChoice;
@@ -162,7 +159,9 @@ function setupPlayButton(ui) {
   if (gameCount === 1) {
     startGameButton.textContent = "What is this place...?";
   } else {
-    startGameButton.textContent = "Another round...?";
+    const textOptions = ["Another round...?", "This time, I'm sure", "How?"];
+    startGameButton.textContent =
+      textOptions[Math.floor(Math.random() * textOptions.length)];
   }
   startGameButton.addEventListener("click", () => {
     revealInterface(startGameButton, ui);
@@ -214,6 +213,8 @@ function cleanup() {
       fadeIn(card);
     });
   }, 2000);
+  const historyButton = document.querySelector("#toggle-history");
+  historyButton.textContent = "Show History";
   sayGoodbye();
 }
 function sayGoodbye() {
@@ -228,7 +229,15 @@ function sayGoodbye() {
   const playAgain =
     document.querySelector("#replay-button") ||
     document.createElement("button");
-  playAgain.textContent = "Once more?";
+  const buttonTextOptions = [
+    "Once more?",
+    "Let me go again",
+    "I'm not done here",
+    "I think I understand..",
+    "What have I done?",
+  ];
+  playAgain.textContent =
+    buttonTextOptions[Math.floor(Math.random() * buttonTextOptions.length)];
   hideElement(playAgain);
   playAgain.setAttribute("id", "replay-button");
   playAgain.addEventListener("click", () => {
@@ -291,7 +300,7 @@ function ensurePlayerName() {
   setupPlayer(playerName);
 }
 function getPlayerName() {
-  const playerName = prompt("Enter a Name for your Player");
+  const playerName = prompt("And who are you?");
   return playerName || "unknown stranger";
 }
 function setupPlayer(name) {
@@ -349,7 +358,9 @@ function updateScoreCounter(winner) {
   fadeIn(winnerScoreDisplay);
 }
 function appendRoundRecordToHistory(roundWinner, roundInputs) {
-  const trackerTable = document.querySelector("#move-history-table");
+  const trackerTable = document
+    .querySelector("#move-history-table")
+    .querySelector("tbody");
   const roundRecord = generateNewRoundRecord(roundWinner, roundInputs);
   fadeIn(roundRecord);
   trackerTable.appendChild(roundRecord);
@@ -459,6 +470,7 @@ function createTrackerTable() {
   // Function to create and return table headers
   const trackerTableHead = createTableHeaders();
   trackerTable.appendChild(trackerTableHead);
+  trackerTable.appendChild(document.createElement("tbody"));
   trackerTable.setAttribute("id", "move-history-table");
   return trackerTable;
 }

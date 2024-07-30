@@ -149,6 +149,8 @@ function hideUI() {
   elements.push(weaponRow);
   const headline = document.querySelector(".headline");
   elements.push(headline);
+  const gameCounter = document.querySelector(".game-counter-container");
+  elements.push(gameCounter);
   elements.forEach((element) => {
     hideElement(element);
   });
@@ -180,7 +182,12 @@ function revealInterface(button, ui) {
       setTimeout(() => {
         fadeIn(element);
       }, 1500);
-    } else {
+    } else if (element.classList.contains("game-counter-container")) {
+      if (gameCount > 1) {
+        updateGameCounter();
+        fadeIn(element);
+      }
+    } else if (!element.classList.contains("game-counter-container")) {
       fadeIn(element);
     }
   });
@@ -233,7 +240,7 @@ function sayGoodbye() {
     "Once more?",
     "Let me go again",
     "I'm not done here",
-    "I think I understand..",
+    "I think I understand now..",
     "What have I done?",
   ];
   playAgain.textContent =
@@ -346,6 +353,10 @@ function updateRoundCounter() {
   const roundCounter = document.querySelector(".round-counter");
   roundCounter.textContent = currentRound;
 }
+function updateGameCounter() {
+  const gameCounter = document.querySelector(".game-counter");
+  gameCounter.textContent = gameCount;
+}
 function updateScoreCounter(winner) {
   const winnerScoreDisplay = document.querySelector(".".concat(winner));
   if (winner === "player") {
@@ -400,7 +411,7 @@ function generateRoundReport(winner, choices) {
   fadeOut(roundReportElement);
   setTimeout(() => {
     if (winner === "player") {
-      roundReportElement.textContent = `${playerName} wins, ${choices.playerChoice} beats ${choices.computerChoice}`;
+      roundReportElement.textContent = `You win, ${choices.playerChoice} beats ${choices.computerChoice}`;
       updateStatistics(winner, choices.playerChoice, choices.computerChoice);
     } else if (winner === "ai") {
       roundReportElement.textContent = `The machine wins, ${choices.computerChoice} beats ${choices.playerChoice}`;
@@ -410,7 +421,6 @@ function generateRoundReport(winner, choices) {
         choices.playerChoice || choices.computerChoice
       }`;
     }
-    // toggleVisibility(roundReportElement);
     fadeIn(roundReportElement);
   }, 2000);
   const historyButton = document.querySelector("#toggle-history");

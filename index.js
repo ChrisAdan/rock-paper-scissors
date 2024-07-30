@@ -197,7 +197,7 @@ function greetPlayer() {
   if (gameCount === 1) {
     greeting.textContent = "Greetings, traveler. Come, stay a while..";
   } else {
-    greeting.textContent = "So, you're back again";
+    greeting.textContent = "So, you're back";
   }
   fadeIn(greeting);
   const startButton = document.querySelector(".start-game-button");
